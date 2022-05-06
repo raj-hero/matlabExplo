@@ -166,15 +166,26 @@ y(1)=[0];
 time(it)=t;
 cd=c;
 
-v1=[100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100];
-Q=diag(v1);
+v1=100;
+Q=zeros(25,25);
+
+for ii=1:1:25
+    for jj=1:1:25
+        if ii==jj
+            Q(ii,jj)=v1;
+        end
+    end
+end
+
+
+
 v2=[50 50];
 R=diag(v2);
 N=zeros(25,2);
 
 [gain,sy,er]=lqr(a,b,Q,R,N);
 
-while t<30
+while t<40
     it=it+1;
     x=ad*xa+bd*u+taud*delp;
     y(it)=cd*x;
@@ -183,5 +194,6 @@ while t<30
     time(it)=t;
     u=-gain*xa;
 end
- plot(time,y);
-  
+plot(time,y);
+
+lqr_resp=[transpose(time) transpose(y)]
