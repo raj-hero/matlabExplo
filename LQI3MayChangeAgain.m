@@ -1,5 +1,3 @@
-% clear all;
-% clc;
 delt=10^-3;
 Tg1=0.08;
 Tt1=0.30;
@@ -151,48 +149,44 @@ delp=[0.01
     0];
 
 
-c=zeros(1,25);
-c(1,1)=1;
-% c(2,3)=1;
-
-t=0;
-it=1;
-
-y(1)=[0];
-time(it)=t;
-cd=c;
-
-Q=100*eye(25);
+% defining the Q,R,N Matrices
+Q=100000000*eye(25);
 Q(26,:)=0;
 Q(:,26)=0;
-Q(26,26)=100;
-v2=[50 50];
+Q(26,26)=100000000;
+v2=[10000000 10000000];
 R=diag(v2);
 N=zeros(26,2);
 
-% d=zeros(2,2);
-% sys=ss(a,b,c,d);
-% [gain,sy,er]=lqi(sys,Q,R,N);
-
+c=zeros(1,25);
+% for delF2(x3)
+c(1,3)=1;
+t=0;
+it=1;
+y(1)=0;
+time(it)=t;
+% getting the value of q
 fun=@(y) -y;
 q=integral(fun,0,1);
 xak=[xa;q];
-% xak=[xa;0];
-ck=[c 0];
+% augmenting the matrices
 bk=[b;0 0];
 tauk=[tau;0 0 0 0];
 ve1=zeros(25,1);
 a=[a ve1];
+ck=[c 0];
 c=[c 0];
 ak=[a;-c];
-
+cd=ck;
+% applying lqr 
+% after augmenting
 [gain,sy,er]=lqr(ak,bk,Q,R,N);
 [ad,bd]=c2d(ak,bk,delt);
 [ad1,taud]=c2d(ak,tauk,delt);
 while t<40
     it=it+1;
     x=ad*xak+bd*u+taud*delp;
-    y(it)=ck*x;
+    y(it)=cd*x;
     xak=x;
     t=t+delt;
     time(it)=t;

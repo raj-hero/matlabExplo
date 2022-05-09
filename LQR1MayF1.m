@@ -161,24 +161,11 @@ c(1,1)=1;
 
 t=0;
 it=1;
-
-y(1)=[0];
+y(1)=0;
 time(it)=t;
 cd=c;
 
-v1=100;
-Q=zeros(25,25);
-
-for ii=1:1:25
-    for jj=1:1:25
-        if ii==jj
-            Q(ii,jj)=v1;
-        end
-    end
-end
-
-
-
+Q=100*eye(25);
 v2=[50 50];
 R=diag(v2);
 N=zeros(25,2);

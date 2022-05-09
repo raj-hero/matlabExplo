@@ -1,5 +1,3 @@
-clear all;
-clc;
 delt=10^-3;
 Tg1=0.08;
 Tt1=0.30;
@@ -113,6 +111,7 @@ a(23,23)=-1/Y1;
 a(24,24)=-1/TWD1;
 a(25,25)=-1/TWD1;
 
+
 b=zeros(25,2);
 
 b(6,1)=1/Tg1;
@@ -139,11 +138,8 @@ tau(24,3)=1/TWD1;
 tau(25,4)=1/TWD1;
 
 det(a);
-eigen=eig(a);
+eig(a);
 
-
-[ad,bd]=c2d(a,b,delt);
-[ad1,taud]=c2d(a,tau,delt);
 xa=zeros(25,1);
 u=[0
     0];
@@ -151,29 +147,49 @@ delp=[0.01
     0
     0
     0];
+
+
+% defining the Q,R,N Matrices
+Q=100*eye(25);
+Q(26,:)=0;
+Q(:,26)=0;
+Q(26,26)=100;
+v2=[50 50];
+R=diag(v2);
+N=zeros(26,2);
+
 c=zeros(1,25);
-c(1,1)=1;
+% for delF2(x3)
+c(1,3)=1;
 t=0;
 it=1;
 y(1)=0;
 time(it)=t;
-cd=c;
-Q=100*eye(25);
-v2=[50 50];
-R=diag(v2);
-N=zeros(25,2);
-[gain,sy,er]=lqr(a,b,Q,R,N);
+% getting the value of q
+fun=@(y) -y;
+q=integral(fun,0,1);
+xak=[xa;q];
+% augmenting the matrices
+bk=[b;0 0];
+tauk=[tau;0 0 0 0];
+ve1=zeros(25,1);
+a=[a ve1];
+ck=[c 0];
+c=[c 0];
+ak=[a;-c];
+cd=ck;
+% applying lqr 
+% after augmenting
+[gain,sy,er]=lqr(ak,bk,Q,R,N);
+[ad,bd]=c2d(ak,bk,delt);
+[ad1,taud]=c2d(ak,tauk,delt);
 while t<40
     it=it+1;
-    x=ad*xa+bd*u+taud*delp;
+    x=ad*xak+bd*u+taud*delp;
     y(it)=cd*x;
-    xa=x;
+    xak=x;
     t=t+delt;
     time(it)=t;
-    u=-gain*xa;
+    u=-gain*xak;
 end
 plot(time,y);
-
-% lqr_resp=[transpose(time) transpose(y)];
-% filename='LQRF11';
-% xlswrite(filename,lqr_resp);

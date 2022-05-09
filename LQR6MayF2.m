@@ -1,5 +1,5 @@
-clear all;
-clc;
+% clear all;
+% clc;
 delt=10^-3;
 Tg1=0.08;
 Tt1=0.30;
@@ -139,11 +139,11 @@ tau(24,3)=1/TWD1;
 tau(25,4)=1/TWD1;
 
 det(a);
-eigen=eig(a);
-
+eig(a);
 
 [ad,bd]=c2d(a,b,delt);
 [ad1,taud]=c2d(a,tau,delt);
+
 xa=zeros(25,1);
 u=[0
     0];
@@ -151,17 +151,21 @@ delp=[0.01
     0
     0
     0];
+
+% defining the Q,R,N Matrices
+Q=100*eye(25);
+v2=[50 50];
+R=diag(v2);
+N=zeros(25,2);
 c=zeros(1,25);
-c(1,1)=1;
+% for delF2(x3)
+c(1,3)=1;
 t=0;
 it=1;
 y(1)=0;
 time(it)=t;
 cd=c;
-Q=100*eye(25);
-v2=[50 50];
-R=diag(v2);
-N=zeros(25,2);
+% applying lqr 
 [gain,sy,er]=lqr(a,b,Q,R,N);
 while t<40
     it=it+1;
@@ -175,5 +179,5 @@ end
 plot(time,y);
 
 % lqr_resp=[transpose(time) transpose(y)];
-% filename='LQRF11';
+% filename='f1qrxl';
 % xlswrite(filename,lqr_resp);

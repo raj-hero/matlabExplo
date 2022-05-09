@@ -150,18 +150,7 @@ delp=[0.01
     0
     0];
 
-
-c=zeros(1,25);
-c(1,1)=1;
-% c(2,3)=1;
-
-t=0;
-it=1;
-
-y(1)=[0];
-time(it)=t;
-cd=c;
-
+% defining the Q,R,N Matrices
 Q=100*eye(25);
 Q(26,:)=0;
 Q(:,26)=0;
@@ -170,32 +159,41 @@ v2=[50 50];
 R=diag(v2);
 N=zeros(26,2);
 
-% d=zeros(2,2);
-% sys=ss(a,b,c,d);
-% [gain,sy,er]=lqi(sys,Q,R,N);
-
+c=zeros(1,25);
+% for delF1(x1)
+c(1,1)=1;
+t=0;
+it=1;
+y(1)=0;
+time(it)=t;
+% getting the value of q
 fun=@(y) -y;
 q=integral(fun,0,1);
 xak=[xa;q];
-% xak=[xa;0];
+% augmenting the matrices
 ck=[c 0];
+cd=ck;
 bk=[b;0 0];
 tauk=[tau;0 0 0 0];
 ve1=zeros(25,1);
 a=[a ve1];
 c=[c 0];
 ak=[a;-c];
-
+% applying lqr
+% after augmenting
 [gain,sy,er]=lqr(ak,bk,Q,R,N);
 [ad,bd]=c2d(ak,bk,delt);
 [ad1,taud]=c2d(ak,tauk,delt);
 while t<40
     it=it+1;
     x=ad*xak+bd*u+taud*delp;
-    y(it)=ck*x;
+    y(it)=cd*x;
     xak=x;
     t=t+delt;
     time(it)=t;
     u=-gain*xak;
 end
 plot(time,y);
+% lqr_resp=[transpose(time) transpose(y)];
+% filename='LQIF11';
+% xlswrite(filename,lqr_resp);

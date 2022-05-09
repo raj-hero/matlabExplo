@@ -1,6 +1,6 @@
 clear all;
 clc;
-delt=10^-3;
+
 Tg1=0.08;
 Tt1=0.30;
 Tr1=10.0;
@@ -142,10 +142,11 @@ det(a);
 eig(a);
 
 
-
+delt=10^-3;
+% discretization of
+% matrices
 [ad,bd]=c2d(a,b,delt);
 [ad1,taud]=c2d(a,tau,delt);
-
 xa=zeros(25,1);
 u=[0
     0];
@@ -153,19 +154,13 @@ delp=[0.01
     0
     0
     0];
-
-
 c=zeros(1,25);
 c(1,1)=1;
-
-
 t=0;
 it=1;
-
-y(1)=[0];
+y(1)=0;
 time(it)=t;
 cd=c;
-
 while t<30
     it=it+1;
     x=ad*xa+bd*u+taud*delp;
@@ -174,5 +169,7 @@ while t<30
     t=t+delt;
     time(it)=t;
 end
- plot(time,y);
-  
+plot(time,y);
+lqr_resp=[transpose(time) transpose(y)];
+filename='withoutF11';
+xlswrite(filename,lqr_resp);
